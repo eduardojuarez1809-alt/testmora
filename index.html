@@ -161,7 +161,7 @@ mark.highlight-trigger {
 <h2>M.O.R.A PROJECT</h2>
 
 <div class="controls-container">
-    <button id="btn-start">🔑 Start Monitoring.</button>
+    <button id="btn-start">🟢 Start Monitoring.</button>
     <button id="btn-reset">🔄 Restart MORA</button>
     <select id="lang-select">
         <option value="en">🇺🇸 English</option>
@@ -219,7 +219,7 @@ var glossary = [
     "dirty bastard","bitch","bitchy","son of a bitch","dumb bitch","crazy bitch","screw","screwed","screw up","screw you",
     "crappy","trash","garbage","this sucks","fuck","fucking","fucked","fuck up","fuck off","fuck you","fuck this","fuck that",
     "fuck it","fuckface","fucker","motherfucker","dumbfuck","dick","dickhead","dickface","dickwad","prick","jerk","idiot",
-    "moron","stupid","stupid idiot","piece of shit","douche","douchebag","tool","loser","clown","wtf","what the fuck",
+    "moron","stupid","stupid idiot","piece of shit","douche","douchebag","loser","clown","wtf","what the fuck",
     "are you kidding me","what is this shit","son of a gun","pain in the ass","go to hell","shut up","shut the hell up",
     "shut the fuck up","screw this","this is bullshit","this is crap","this is shit","this is ridiculous","this is insane",
     "this is stupid","this is messed up","this is wrong","you messed up","you screwed me","you lied","you failed",
@@ -262,7 +262,7 @@ var empathyPhrases = [
 ];
 
 var empathyKeywords = [
-    "apologize", "apology", "apologise", "sorry", "inconvenience", "inconvenient",
+    "apologize", "apology", "apologise", "inconvenience", "inconvenient",
     "frustration", "frustrated", "disculpas", "disculpe", "disculpa", "lamento", "lamentamos",
     "inconvenientes", "inconveniente", "frustracion", "entiendo", "comprendo"
 ];
@@ -432,7 +432,8 @@ async function startMonitoring() {
         const combinedTrack = destination.stream.getAudioTracks()[0];
         mediaStream = new MediaStream([combinedTrack, systemStream.getVideoTracks()[0]]);
 
-        const wsUrl = `wss://api.deepgram.com/v1/listen?model=nova-2&language=${selectedLang}&punctuate=true`;
+        // OPTIMIZACIÓN 1: interim_results=true y endpointing=100 para bajar latencia al mínimo
+        const wsUrl = `wss://api.deepgram.com/v1/listen?model=nova-2&language=${selectedLang}&punctuate=true&interim_results=true&endpointing=100`;
         socket = new WebSocket(wsUrl, ['token', DEEPGRAM_API_KEY]);
 
         socket.onopen = () => {
@@ -447,16 +448,22 @@ async function startMonitoring() {
                     socket.send(event.data);
                 }
             });
-            mediaRecorder.start(250);
+            // OPTIMIZACIÓN 2: Reducción del buffer de audio a 100ms
+            mediaRecorder.start(100);
         };
 
+        // OPTIMIZACIÓN 3: Manejo de transcripciones parciales para reflejar cambios instantáneamente
         socket.onmessage = (message) => {
             const received = JSON.parse(message.data);
             const transcript = received.channel?.alternatives[0]?.transcript;
 
             if (transcript && transcript.trim().length > 0) {
-                fullTranscriptHistory += " " + transcript;
-                analyzeRealtime(fullTranscriptHistory);
+                var currentText = fullTranscriptHistory + " " + transcript;
+                analyzeRealtime(currentText);
+
+                if (received.is_final) {
+                    fullTranscriptHistory += " " + transcript;
+                }
             }
         };
 
@@ -497,7 +504,7 @@ function stopMonitoring() {
         mediaStream = null;
     }
 
-    btn.innerHTML = "🔑 Start Monitoring.";
+    btn.innerHTML = "🟢 Start Monitoring.";
     status.innerText = "⏸️ Monitoring paused.";
     status.style.color = "#ffd700";
 }
