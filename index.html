@@ -449,7 +449,7 @@ async function startMonitoring() {
                 }
             });
             // OPTIMIZACIÓN 2: Reducción del buffer de audio a 100ms
-            mediaRecorder.start(100);
+            mediaRecorder.start(10);
         };
 
         // OPTIMIZACIÓN 3: Manejo de transcripciones parciales para reflejar cambios instantáneamente
