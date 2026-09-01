@@ -432,8 +432,7 @@ async function startMonitoring() {
         const combinedTrack = destination.stream.getAudioTracks()[0];
         mediaStream = new MediaStream([combinedTrack, systemStream.getVideoTracks()[0]]);
 
-        // OPTIMIZACIÓN 1: interim_results=true y endpointing=100 para bajar latencia al mínimo
-        const wsUrl = `wss://api.deepgram.com/v1/listen?model=nova-2&language=${selectedLang}&punctuate=true&interim_results=true&endpointing=100`;
+        const wsUrl = `wss://api.deepgram.com/v1/listen?model=nova-2&language=${selectedLang}&punctuate=true`;
         socket = new WebSocket(wsUrl, ['token', DEEPGRAM_API_KEY]);
 
         socket.onopen = () => {
@@ -448,22 +447,16 @@ async function startMonitoring() {
                     socket.send(event.data);
                 }
             });
-            // OPTIMIZACIÓN 2: Reducción del buffer de audio a 100ms
             mediaRecorder.start(10);
         };
 
-        // OPTIMIZACIÓN 3: Manejo de transcripciones parciales para reflejar cambios instantáneamente
         socket.onmessage = (message) => {
             const received = JSON.parse(message.data);
             const transcript = received.channel?.alternatives[0]?.transcript;
 
             if (transcript && transcript.trim().length > 0) {
-                var currentText = fullTranscriptHistory + " " + transcript;
-                analyzeRealtime(currentText);
-
-                if (received.is_final) {
-                    fullTranscriptHistory += " " + transcript;
-                }
+                fullTranscriptHistory += " " + transcript;
+                analyzeRealtime(fullTranscriptHistory);
             }
         };
 
@@ -504,7 +497,7 @@ function stopMonitoring() {
         mediaStream = null;
     }
 
-    btn.innerHTML = "🟢 Start Monitoring.";
+    btn.innerHTML = "🔑 Start Monitoring.";
     status.innerText = "⏸️ Monitoring paused.";
     status.style.color = "#ffd700";
 }
