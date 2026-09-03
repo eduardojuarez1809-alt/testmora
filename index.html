@@ -11,7 +11,6 @@ body {
     color: #e0e0e0;
 }
 
-/* TITULO PRINCIPAL M.O.R.A PROJECT */
 h2 {
     font-size: 34px;
     font-weight: 900;
@@ -43,9 +42,7 @@ h2 {
     align-items: center;
     gap: 6px;
 }
-#btn-start:hover {
-    background-color: #ffe44d;
-}
+#btn-start:hover { background-color: #ffe44d; }
 
 #btn-reset {
     background-color: #00bcd4;
@@ -60,9 +57,7 @@ h2 {
     align-items: center;
     gap: 6px;
 }
-#btn-reset:hover {
-    background-color: #33d0e1;
-}
+#btn-reset:hover { background-color: #33d0e1; }
 
 #lang-select {
     background-color: #1a1a1a;
@@ -186,9 +181,8 @@ mark.highlight-trigger {
 const DEEPGRAM_API_KEY = "6ac125a3e51eb51126c7636b1f1477b4480b068b"; 
 
 var socket = null;
-var mediaRecorder = null;
-var mediaStream = null;
 var audioContext = null;
+var processorNode = null;
 var isListening = false;
 var rawTranscriptHistory = "";
 
@@ -308,25 +302,7 @@ var empathyPhrases = [
     "lamento la frustracion", "sinceras disculpas", "completely understand", "understand your concern",
     "understand why you would feel frustrated", "see why this would be upsetting",
     "understand the importance", "appreciate the opportunity", "entiendo completamente",
-    "comprendo por que", "reconozco la importancia", "sus preocupaciones son validas",
-    "I didn't get the billing statement", "I never received my statement", "I was not aware a payment was due",
-    "Nobody informed me about the payment", "I don't want this to affect my credit", "I am concerned about my credit score",
-    "I don't think this should impact my credit", "This is not fair", "I don't think that's fair",
-    "It's very frustrating", "This is very upsetting", "It's concerning", "It's very unnerving",
-    "This situation has me worried", "I was just confused because of that", "Nobody can confirm it",
-    "No one can give me a clear answer", "I keep getting different information", "I don't understand what happened",
-    "Had I received the statement, I would have paid on time", "I shouldn't be penalized for this",
-    "I feel like this is not my fault", "I'm being held responsible for something I wasn't aware of",
-    "I need confirmation that my credit won't be affected", "This has caused me unnecessary stress",
-    "No recibí el estado de cuenta", "Nunca recibí mi estado de cuenta", "No sabía que tenía un pago pendiente",
-    "Nadie me informó sobre el pago", "No quiero que esto afecte mi crédito", "Estoy preocupado por mi historial crediticio",
-    "No considero justo que esto impacte mi crédito", "Esto no es justo", "No me parece justo",
-    "Es muy frustrante", "Esta situación es muy molesta", "Es preocupante", "Me genera mucha incertidumbre",
-    "Esta situación me tiene preocupado", "Estaba confundido por esa razón", "Nadie puede confirmármelo",
-    "Nadie me puede dar una respuesta clara", "Sigo recibiendo información diferente", "No entiendo qué fue lo que pasó",
-    "Si hubiera recibido el estado de cuenta, habría pagado a tiempo", "No deberían penalizarme por esto",
-    "Siento que esto no fue mi culpa", "Me están responsabilizando por algo que desconocía",
-    "Necesito una confirmación de que mi crédito no será afectado", "Esto me ha causado estrés innecesario"
+    "comprendo por que", "reconozco la importancia", "sus preocupaciones son validas"
 ];
 
 var empathyKeywords = [
@@ -336,30 +312,30 @@ var empathyKeywords = [
 ];
 
 var bsdRules = [
-    { code: "BSDFRD", label: "Fraud", keywords: ["fraud", "identity theft", "stolen", "scam", "fraude", "robo de identidad", "usurpacion", "unauthorized", "suspicious activity", "compromised", "phishing", "fake", "forged", "unauthorized charge", "fraudulent", "fake account", "stolen card", "hacked", "no autorizada", "sin mi consentimiento", "no reconozco", "sospechoso", "estafa", "robo", "enganado", "falsificado"] },
-    { code: "BSDBNK", label: "Bankruptcy Issue Resolved", keywords: ["bankrupt", "bankruptcy", "chapter 7", "chapter 13", "bancarrota", "quiebra", "discharge", "automatic stay", "trustee", "creditors meeting", "341 meeting", "filing bankruptcy", "reorganization", "insolvency", "declararse en quiebra", "juez de quiebras", "alguacil de quiebras", "suspension automatica", "auto de descarga"] },
-    { code: "BSDFOR", label: "Foreclosure Issue Resolved", keywords: ["foreclosure", "sheriff sale", "seizure", "ejecucion hipotecaria", "embargo", "auction date", "foreclosure attorney", "notice of default", "nod", "notice of sale", "repossessed", "eviction", "remate", "subasta pública", "orden de desalojo", "notificacion de mora", "perder mi casa", "quitar la casa", "rematar mi casa"] },
-    { code: "BSDCBR", label: "Credit Report Issue Resolved", keywords: ["credit report", "credit bureau", "equifax", "experian", "transunion", "reporte de credito", "buro de credito", "late payment reported", "credit score dropped", "dispute credit", "wrong reporting", "delete late", "credit hit", "derogatory mark", "afecto mi credito", "mal reporte", "puntuacion de credito", "bram", "disputa de credito", "historial crediticio", "marca negativa", "remover reporte"] },
-    { code: "BSDACH", label: "ACH Issue Resolved", keywords: ["ach", "direct debit", "auto pay", "automatic payment", "debito automatico", "retiro automatico", "pago automatico", "autopay failed", "double debit", "wrong account debited", "nsf ach", "recurring payment", "cancel autopay", "bank draft", "descuento automatico", "cobro automatico", "doble cobro ach", "cancelar autopay", "debitado de mas", "cuenta equivocado ach", "fallo el autopay"] },
-    { code: "BSDFEE", label: "Fee Issue Resolved", keywords: ["fee", "late fee", "charge", "penalty", "cargo", "tarifa", "comision", "multa", "cobro indebido", "waive fee", "nsf fee", "processing fee", "service fee", "unexplained charge", "improper fee", "reimburse fee", "quitar mora", "quitar recargo", "cargo por atraso", "cargo no autorizado", "comision por pago tardio", "reembolso de multa", "cargos injustificados"] },
-    { code: "BSDTAX", label: "Taxes Issues Resolved", keywords: ["tax", "taxes", "property tax", "1098", "impuesto", "impuestos", "contribuciones", "tax sale", "delinquent taxes", "tax assessment", "county tax", "supplemental tax", "tax penalty", "impuestos de la propiedad", "impuesto predial", "pago de taxes", "contribuciones pendientes", "forma 1098", "intereses e impuestos", "tesoreria del condado"] },
-    { code: "BSDINS", label: "Insurance Issue Resolved", keywords: ["insurance", "hazard insurance", "flood insurance", "policy", "seguro", "poliza", "aseguradora", "force placed insurance", "lender placed", "insurance claim", "dec page", "proof of insurance", "cancellation notice", "insurance premium", "seguro de incendio", "seguro de inundacion", "seguro obligatorio", "comprobante de seguro", "reclamo de seguro", "prima de seguro", "seguro vencido"] },
-    { code: "BSDESC", label: "Escrow Issue Resolved", keywords: ["escrow", "escrow account", "escrow shortage", "caja de ahorro", "escrow surplus", "escrow analysis", "cushion", "escrow balance", "impound account", "escrow deficiency", "aumento de escrow", "deficit de escrow", "sobrante de escrow", "analisis de escrow", "cuenta pliza y taxes", "reserva de escrow", "aumento de pago mensual por escrow"] },
-    { code: "BSDLOS", label: "Loss Mitigation Issue Resolved", keywords: ["loss mitigation", "loan modification", "forbearance", "workout plan", "modificacion de prestamo", "mitigacion de perdida", "trial plan", "deferment", "partial claim", "short sale", "deed in lieu", "assistance package", "hardship", "modificacion de hipoteca", "plan de pagos", "diferimiento", "venta corta", "paquete de ayuda", "dificultad financiera", "pausa de pagos", "arreglo de pago"] },
-    { code: "BSDMIP", label: "MIP/PMI Issue Resolved", keywords: ["pmi", "mip", "private mortgage insurance", "seguro hipotecario privado", "pmi removal", "cancel pmi", "pmi disclosure", "ltv requirement", "appraisal for pmi", "fha mip", "cancelar pmi", "quitar seguro hipotecario", "eliminacion de pmi", "porcentaje del prestamo", "avaluo para pmi", "prima de seguro hipotecario"] },
-    { code: "BSDPAY", label: "Payment Issue Resolved", keywords: ["payment", "check", "posting", "afford", "can't pay", "cant pay", "pago", "cheque", "no puedo pagar", "no me alcanza", "payment unapplied", "suspense account", "partial payment", "misapplied payment", "grace period", "payment posted late", "cashier check", "money order", "pago no reflejado", "cuenta de suspenso", "pago incompleto", "pago mal aplicado", "giro postal", "cheque rebotado", "fecha de corte de pago"] },
-    { code: "BSDPOF", label: "Payoff Issue Resolved", keywords: ["payoff", "pay off", "payoff quote", "liquidar", "monto de liquidacion", "saldar cuenta", "payoff demand", "good-through date", "payoff fees", "payoff wiring instructions", "pay off balance", "cotizacion de liquidacion", "monto para cancelar hipoteca", "instrucciones de transferencia para pago total", "cuanto debo para cancelar", "saldo total"] },
-    { code: "BSDPFS", label: "PIF Satis. Issue Resolved", keywords: ["paid in full", "satisfaction letter", "pif", "pagado por completo", "satisfaccion de hipoteca", "lien release", "deed of reconveyance", "mortgage release", "cancelation certificate", "account paid off", "carta de saldo", "liberacion de gravamen", "titulo cancelado", "cancelacion de hipoteca", "prestamo totalmente pagado", "documento de reconcesion"] },
-    { code: "BSDACM", label: "Account Maintenance Issue Resolved", keywords: ["address change", "name change", "mailing address", "account info", "actualizacion de datos", "cambio de direccion", "update phone", "update email", "marriage certificate", "divorce decree", "authorized party", "change of ownership", "actualizar telefono", "actualizar correo", "cambiar nombre de titular", "tercero autorizado", "acta de matrimonio", "decreto de divorcio", "datos de contacto"] },
-    { code: "BSDDEF", label: "Default Issue Resolved", keywords: ["default", "delinquent", "behind on payments", "mora", "atraso", "incumplimiento", "past due", "late payments", "breach letter", "acceleration notice", "cure period", "pago atrasado", "cuotas vencidas", "carta de incumplimiento", "estado de mora", "atrasado con la hipoteca", "notificacion de aceleracion"] },
-    { code: "BSDDIS", label: "Natural Disaster Issue Resolved", keywords: ["disaster", "hurricane", "storm", "flood", "wildfire", "desastre natural", "huracan", "tormenta", "inundacion", "fema", "tornado", "earthquake", "disaster relief", "disaster forbearance", "property damage", "terremoto", "incendio forestal", "alerta de desastre", "declaracion de fema", "alivio por desastre", "danos a la propiedad por clima"] },
-    { code: "BSDEMC", label: "Email/Chat Service Issue Resolved", keywords: ["email", "chat", "message", "correo", "mensaje", "secure message", "webchat", "no response", "email bounced", "chat disconnected", "attachment issue", "portal message", "correo electronico", "chat en linea", "no me contestaron el correo", "error en archivo adjunto", "mensaje de portal"] },
-    { code: "BSDPHN", label: "Phone Service Issue Resolved", keywords: ["phone", "call", "hold time", "hung up", "representative", "telefono", "llamada", "tiempo de espera", "representante", "bad connection", "dropped call", "transferred multiple times", "rude agent", "no callback", "call center", "espera muy larga", "me cortaron la llamada", "me colgaron", "transferencia repetida", "agente grosero", "no me devolvieron la llamada", "mala señal"] },
-    { code: "BSDWEB", label: "Web Issue Resolved", keywords: ["website", "online portal", "login", "password reset", "pagina web", "sitio web", "clave", "iniciar sesion", "system error", "site down", "app crashed", "2fa code", "locked out", "technical glitch", "error de pagina", "sistema caido", "falla la app", "olvide mi contraseña", "cuenta bloqueada", "no me deja entrar", "problema con el portal", "codigo de verificacion no llega"] },
-    { code: "BSDYED", label: "Year-End Issue Resolved", keywords: ["year end", "year-end", "annual statement", "1098 statement", "fin de ano", "estado de cuenta anual", "tax form 1098", "year end escrow summary", "annual tax info", "escrow statement annual", "resumen anual", "estado de cuenta de fin de año", "formulario de impuestos 1098", "informacion fiscal anual", "resumen de intereses pagados"] },
-    { code: "BSDDBI", label: "Deceased Borrower Process", keywords: ["deceased", "passed away", "died", "fallecido", "defuncion", "muerto", "death certificate", "borrower passed", "surviving spouse", "estate administrator", "probate", "acta de defuncion", "titular fallecio", "conyuge sobreviviente", "administrador de bienes", "juicio sucesorio", "fallecimiento del cliente"] },
-    { code: "BSDSII", label: "Successor in Interest", keywords: ["successor", "sii", "heir", "heredero", "sucesor", "successor in interest", "inherited property", "transfer of ownership", "sii package", "legal heir", "propiedad heredada", "transferencia de propiedad", "paquete de sucesor", "heredero legal", "derecho de sucesion", "asumir la propiedad"] },
-    { code: "BSDHEL", label: "HELOC", keywords: ["heloc", "line of credit", "linea de credito", "home equity", "draw period", "repayment period", "variable rate heloc", "credit line limit", "heloc checkbook", "equity line", "periodo de retiro", "periodo de pago heloc", "tasa variable de credito", "limite de linea de credito", "credito sobre la plusvalia"] }
+    { code: "BSDFRD", label: "Fraud", keywords: ["fraud", "identity theft", "stolen", "scam", "fraude", "robo de identidad", "usurpacion", "unauthorized", "suspicious activity", "compromised", "phishing", "fake", "forged", "unauthorized charge", "fraudulent"] },
+    { code: "BSDBNK", label: "Bankruptcy Issue Resolved", keywords: ["bankrupt", "bankruptcy", "chapter 7", "chapter 13", "bancarrota", "quiebra", "discharge", "automatic stay"] },
+    { code: "BSDFOR", label: "Foreclosure Issue Resolved", keywords: ["foreclosure", "sheriff sale", "seizure", "ejecucion hipotecaria", "embargo", "auction date", "foreclosure attorney"] },
+    { code: "BSDCBR", label: "Credit Report Issue Resolved", keywords: ["credit report", "credit bureau", "equifax", "experian", "transunion", "reporte de credito", "buro de credito", "late payment reported", "credit score dropped"] },
+    { code: "BSDACH", label: "ACH Issue Resolved", keywords: ["ach", "direct debit", "auto pay", "automatic payment", "debito automatico", "retiro automatico", "pago automatico", "autopay failed", "double debit"] },
+    { code: "BSDFEE", label: "Fee Issue Resolved", keywords: ["fee", "late fee", "charge", "penalty", "cargo", "tarifa", "comision", "multa", "cobro indebido", "waive fee"] },
+    { code: "BSDTAX", label: "Taxes Issues Resolved", keywords: ["tax", "taxes", "property tax", "1098", "impuesto", "impuestos", "contribuciones"] },
+    { code: "BSDINS", label: "Insurance Issue Resolved", keywords: ["insurance", "hazard insurance", "flood insurance", "policy", "seguro", "poliza", "aseguradora"] },
+    { code: "BSDESC", label: "Escrow Issue Resolved", keywords: ["escrow", "escrow account", "escrow shortage", "caja de ahorro", "escrow surplus", "escrow analysis"] },
+    { code: "BSDLOS", label: "Loss Mitigation Issue Resolved", keywords: ["loss mitigation", "loan modification", "forbearance", "workout plan", "modificacion de prestamo", "mitigacion de perdida"] },
+    { code: "BSDMIP", label: "MIP/PMI Issue Resolved", keywords: ["pmi", "mip", "private mortgage insurance", "seguro hipotecario privado", "pmi removal", "cancel pmi"] },
+    { code: "BSDPAY", label: "Payment Issue Resolved", keywords: ["payment", "check", "posting", "afford", "can't pay", "cant pay", "pago", "cheque", "no puedo pagar", "no me alcanza"] },
+    { code: "BSDPOF", label: "Payoff Issue Resolved", keywords: ["payoff", "pay off", "payoff quote", "liquidar", "monto de liquidacion", "saldar cuenta"] },
+    { code: "BSDPFS", label: "PIF Satis. Issue Resolved", keywords: ["paid in full", "satisfaction letter", "pif", "pagado por completo", "satisfaccion de hipoteca"] },
+    { code: "BSDACM", label: "Account Maintenance Issue Resolved", keywords: ["address change", "name change", "mailing address", "account info", "actualizacion de datos", "cambio de direccion"] },
+    { code: "BSDDEF", label: "Default Issue Resolved", keywords: ["default", "delinquent", "behind on payments", "mora", "atraso", "incumplimiento", "past due"] },
+    { code: "BSDDIS", label: "Natural Disaster Issue Resolved", keywords: ["disaster", "hurricane", "storm", "flood", "wildfire", "desastre natural", "huracan", "tormenta"] },
+    { code: "BSDEMC", label: "Email/Chat Service Issue Resolved", keywords: ["email", "chat", "message", "correo", "mensaje", "secure message", "webchat"] },
+    { code: "BSDPHN", label: "Phone Service Issue Resolved", keywords: ["phone", "call", "hold time", "hung up", "representative", "telefono", "llamada", "tiempo de espera"] },
+    { code: "BSDWEB", label: "Web Issue Resolved", keywords: ["website", "online portal", "login", "password reset", "pagina web", "sitio web", "clave", "iniciar sesion"] },
+    { code: "BSDYED", label: "Year-End Issue Resolved", keywords: ["year end", "year-end", "annual statement", "1098 statement", "fin de ano"] },
+    { code: "BSDDBI", label: "Deceased Borrower Process", keywords: ["deceased", "passed away", "died", "fallecido", "defuncion", "muerto"] },
+    { code: "BSDSII", label: "Successor in Interest", keywords: ["successor", "sii", "heir", "heredero", "sucesor", "successor in interest"] },
+    { code: "BSDHEL", label: "HELOC", keywords: ["heloc", "line of credit", "linea de credito", "home equity"] }
 ];
 
 function normalize(text) {
@@ -430,10 +406,7 @@ function getBSDSuggestion(textNormalized) {
 
         if (ruleScore > maxScore) {
             maxScore = ruleScore;
-            bestMatch = {
-                rule: bsdRules[i],
-                matchedKeys: matchedKeys
-            };
+            bestMatch = { rule: bsdRules[i], matchedKeys: matchedKeys };
         }
     }
 
@@ -553,6 +526,17 @@ function toggleMonitoring() {
     }
 }
 
+// Convertidor de Audio a PCM Linear16 de 16-bit
+function convertFloat32ToInt16(buffer) {
+    let l = buffer.length;
+    let buf = new Int16Array(l);
+    while (l--) {
+        let s = Math.max(-1, Math.min(1, buffer[l]));
+        buf[l] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+    }
+    return buf.buffer;
+}
+
 async function startMonitoring() {
     var btn = document.getElementById("btn-start");
     var status = document.getElementById("status");
@@ -564,11 +548,7 @@ async function startMonitoring() {
 
         const systemStream = await navigator.mediaDevices.getDisplayMedia({
             video: true,
-            audio: {
-                echoCancellation: true,
-                noiseSuppression: true,
-                autoGainControl: true
-            }
+            audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
         });
 
         const systemAudioTrack = systemStream.getAudioTracks()[0];
@@ -582,28 +562,21 @@ async function startMonitoring() {
         status.innerText = "⏳ 2/2: Requesting microphone access (Agent)...";
 
         const micStream = await navigator.mediaDevices.getUserMedia({
-            audio: {
-                echoCancellation: true,
-                noiseSuppression: true,
-                autoGainControl: true
-            }
+            audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
         });
 
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const merger = audioContext.createChannelMerger(2);
+        const sampleRate = audioContext.sampleRate;
 
+        const merger = audioContext.createChannelMerger(2);
         const micSource = audioContext.createMediaStreamSource(micStream);
         const systemSource = audioContext.createMediaStreamSource(systemStream);
 
         micSource.connect(merger, 0, 0);       // Canal 0: Agente
         systemSource.connect(merger, 0, 1);    // Canal 1: Cliente
 
-        const dest = audioContext.createMediaStreamDestination();
-        merger.connect(dest);
-        mediaStream = dest.stream;
-
         var langCode = (selectedLang === "es") ? "es" : "en-US";
-        var wsUrl = "wss://api.deepgram.com/v1/listen?encoding=linear16&sample_rate=" + audioContext.sampleRate + "&channels=2&multichannel=true&language=" + langCode + "&model=nova-2";
+        var wsUrl = "wss://api.deepgram.com/v1/listen?encoding=linear16&sample_rate=" + sampleRate + "&channels=2&multichannel=true&language=" + langCode + "&model=nova-2";
 
         socket = new WebSocket(wsUrl, ["token", DEEPGRAM_API_KEY]);
 
@@ -613,14 +586,27 @@ async function startMonitoring() {
             btn.innerText = "🔴 Stop Monitoring";
             isListening = true;
 
-            mediaRecorder = new MediaRecorder(mediaStream, { mimeType: "audio/webm" });
-            mediaRecorder.addEventListener("dataavailable", async function(event) {
-                if (event.data.size > 0 && socket.readyState === 1) {
-                    var arrayBuffer = await event.data.arrayBuffer();
-                    socket.send(arrayBuffer);
+            // Procesador en tiempo real para convertir muestras a PCM
+            processorNode = audioContext.createScriptProcessor(4096, 2, 2);
+            merger.connect(processorNode);
+            processorNode.connect(audioContext.destination);
+
+            processorNode.onaudioprocess = function(e) {
+                if (!isListening || socket.readyState !== 1) return;
+
+                const left = e.inputBuffer.getChannelData(0);
+                const right = e.inputBuffer.getChannelData(1);
+
+                // Intercalar canales estéreo (Canal 0 Agente, Canal 1 Cliente)
+                const interleaved = new Float32Array(left.length + right.length);
+                for (let i = 0; i < left.length; i++) {
+                    interleaved[i * 2] = left[i];
+                    interleaved[i * 2 + 1] = right[i];
                 }
-            });
-            mediaRecorder.start(10);
+
+                const pcmBuffer = convertFloat32ToInt16(interleaved);
+                socket.send(pcmBuffer);
+            };
         };
 
         socket.onmessage = function(msg) {
@@ -633,7 +619,7 @@ async function startMonitoring() {
                     
                     var normFragment = normalize(transcript);
 
-                    // Si habla el Agente y pronuncia una frase de apertura, se auto-reinicia la transcripción
+                    // Auto-reset si el Agente dice una frase de opening
                     if (speaker === "Agent" && checkOpeningPhrase(normFragment)) {
                         resetTranscript();
                     }
@@ -665,8 +651,9 @@ function stopMonitoring() {
     var btn = document.getElementById("btn-start");
     var status = document.getElementById("status");
 
-    if (mediaRecorder && mediaRecorder.state !== "inactive") {
-        mediaRecorder.stop();
+    if (processorNode) {
+        processorNode.disconnect();
+        processorNode = null;
     }
     if (socket && socket.readyState === 1) {
         socket.close();
