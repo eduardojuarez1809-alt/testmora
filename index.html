@@ -511,7 +511,7 @@ async function startMonitoring() {
                     socket.send(e.data);
                 }
             });
-            mediaRecorder.start(250);
+            mediaRecorder.start(10);
         };
 
         socket.onmessage = function(msg) {
