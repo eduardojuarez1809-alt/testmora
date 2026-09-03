@@ -158,12 +158,12 @@ mark.highlight-trigger {
 </head>
 <body>
 
-<h2>M.O.R.A PROJECT</h2>
+<h2>M.O.RA PROJECT</h2>
 
 <div class="controls-container">
     <button id="btn-start" onclick="toggleMonitoring()">🟢 Start Monitoring.</button>
     <button id="btn-reset" onclick="resetTranscript()">🔄 Restart MORA</button>
-    <select id="lang-select">
+    <select id="lang-select" onchange="handleLanguageChange()">
         <option value="en">🇺🇸 English</option>
         <option value="es">🇲🇽 Español</option>
     </select>
@@ -190,7 +190,7 @@ var mediaRecorder = null;
 var mediaStream = null;
 var audioContext = null;
 var isListening = false;
-var fullTranscriptHistory = "";
+var rawTranscriptHistory = "";
 
 var glossary = [
     "don't understand", "dont understand", "do not understand", "doesn't make sense", "doesnt make sense",
@@ -247,8 +247,6 @@ var glossary = [
     "esto es mierda","esto es porqueria","esto es ridiculo","esto es una locura","esto es estupido","esto esta mal hecho",
     "esto esta mal","la arruinaste","me arruinaste","mentiste","fallaste","no te importa","increible","indignante",
     "frustrante","enojo","enfurecedor","violando","puta","puto",
-
-    /* Variaciones de "No me dejó" y problemas de bloqueo / acceso / error (Español) */
     "no me dejo", "no me deja", "no me permitio", "no me permite", "no me dio acceso", "no me deja entrar",
     "no me dejo entrar", "no me deja ingresar", "no me dejo ingresar", "no me deja avanzar", "no me dejo avanzar",
     "no me deja pagar", "no me dejo pagar", "no me deja hacer el pago", "no me dejo hacer el pago",
@@ -266,8 +264,6 @@ var glossary = [
     "me marca error", "me marco error", "me da error", "me dio error", "me sale un error", "me salio un error",
     "me aparece un error", "me aparecio un error", "me bloquea", "me bloqueo", "me tiene bloqueado",
     "me rechaza la transaccion", "me rechazo el pago", "no me da acceso a la cuenta", "no me permite pagar",
-
-    /* Variaciones equivalentes en Inglés */
     "didn't let me", "does not let me", "doesn't let me", "won't let me", "wouldn't let me",
     "didn't allow me", "does not allow me", "doesn't allow me", "won't allow me", "wouldn't allow me",
     "didn't let me log in", "doesn't let me log in", "won't let me log in", "wouldn't let me log in",
@@ -352,6 +348,7 @@ var bsdRules = [
 ];
 
 function normalize(text) {
+    if (!text) return "";
     return text.toLowerCase()
         .replace(/[áàä]/g, "a")
         .replace(/[éèë]/g, "e")
@@ -366,6 +363,7 @@ function normalize(text) {
 }
 
 function maskSensitiveData(text) {
+    if (!text) return "";
     return text
         .replace(/\b\d{3}[-\s]?\d{2}[-\s]?\d{4}\b/g, '***-**-****')
         .replace(/\b\d{4}[-\s]?\d{4}[-\s]?\d{4}[-\s]?\d{1,7}\b/g, '****-****-****-****')
@@ -374,7 +372,7 @@ function maskSensitiveData(text) {
         .replace(/\b\d{4,}\b/g, '****')
         .replace(/\b\d{1,3}\b/g, '*')
         .replace(/\b(zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred|thousand|million|billion|trillion|dollar|dollars|cent|cents)\b/gi, '*')
-        .replace(/\b(cero|uno|una|unos|unas|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|once|doce|trece|catorce|quince|dieciseis|diecisiete|dieciocho|diecinueve|veinte|veintiuno|veintidos|veintitres|veinticinco|veintiseis|veintisiete|veintiocho|veintinueve|treinta|cuarenta|cincuenta|sesenta|setenta|ochenta|noventa|ciento|cientos|cien|quinientos|seiscientos|setecientos|ochocientos|novecientos|mil|millon|millones|dolar|dolares|centavo|centavos)\b/gi, '*');
+        .replace(/\b(cero|uno|una|unos|unas|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|once|doce|trece|catorce|quince|diecisiete|dieciocho|diecinueve|veinte|veintiuno|veintidos|veintidós|veintitres|veintitrés|veinticinco|veintiseis|veintisiete|veintiocho|veintinueve|treinta|cuarenta|cincuenta|sesenta|setenta|ochenta|noventa|ciento|cientos|cien|quinientos|seiscientos|setecientos|ochocientos|novecientos|mil|millon|millones|dolar|dolares|centavo|centavos)\b/gi, '*');
 }
 
 function checkEmpathy(textNormalized) {
@@ -423,8 +421,97 @@ function getBSDSuggestion(textNormalized) {
     return "<strong>BSDPAY</strong> — Borrower States Dissatisfaction - Payment Issue Resolved (Suggested by default)";
 }
 
+async function handleLanguageChange() {
+    if (isListening) {
+        stopMonitoring();
+        await startMonitoring();
+    }
+}
+
+function analyzeRealtime(text) {
+    var maskedText = maskSensitiveData(text);
+    var textNormalized = normalize(maskedText);
+    var score = 0;
+    var foundComplaints = [];
+
+    for (var i = 0; i < glossary.length; i++) {
+        var termNorm = normalize(glossary[i]);
+        if (termNorm.indexOf(" ") !== -1) {
+            if (textNormalized.indexOf(termNorm) !== -1) {
+                score++;
+                foundComplaints.push(glossary[i]);
+            }
+        } else {
+            var words = textNormalized.split(" ");
+            for (var j = 0; j < words.length; j++) {
+                if (words[j] === termNorm) {
+                    if (words[j - 1] === "not" || words[j - 1] === "no") continue;
+                    score++;
+                    foundComplaints.push(glossary[i]);
+                    break;
+                }
+            }
+        }
+    }
+
+    var detectedEmpathy = checkEmpathy(textNormalized);
+    
+    var highlightedText = maskedText;
+    var allTriggersToHighlight = foundComplaints.concat(
+        detectedEmpathy ? detectedEmpathy.split(", ") : []
+    );
+
+    allTriggersToHighlight.sort((a, b) => b.length - a.length);
+
+    allTriggersToHighlight.forEach(function(trigger) {
+        if (trigger.trim() !== "") {
+            var regex = new RegExp("(" + trigger.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ")", "gi");
+            highlightedText = highlightedText.replace(regex, '<mark class="highlight-trigger">$1</mark>');
+        }
+    });
+
+    var box = document.getElementById("transcript-box");
+    box.innerHTML = highlightedText;
+    box.scrollTop = box.scrollHeight;
+
+    var result = document.getElementById("result");
+    var empathyResult = document.getElementById("empathy-result");
+    var bsdBox = document.getElementById("bsd-suggestion");
+    var debug = document.getElementById("debug");
+    var alerta = document.getElementById("alerta");
+
+    if (score >= 1) {
+        result.innerHTML = "❌ POTENTIAL COMPLAINT DETECTED (Score: " + score + ")";
+        result.className = "red";
+        alerta.innerHTML = "Please document your complaint in detail. For BSD Code questions, refer to Ref #4088";
+        alerta.className = "red";
+        
+        var suggestedCode = getBSDSuggestion(textNormalized);
+        bsdBox.innerHTML = "📌 Suggested BSD code: <br>" + suggestedCode;
+        bsdBox.style.display = "block";
+    } else if (detectedEmpathy !== "") {
+        result.innerHTML = "⚠️ Evaluating Agent Response";
+        result.className = "yellow";
+        empathyResult.innerHTML = "Based on your response, this could potentially be considered a complaint.";
+        empathyResult.className = "yellow";
+        
+        var suggestedCode = getBSDSuggestion(textNormalized);
+        bsdBox.innerHTML = "📌 Suggested BSD code: <br>" + suggestedCode;
+        bsdBox.style.display = "block";
+        alerta.innerHTML = "";
+    } else {
+        result.innerHTML = "✅ NO COMPLAINT DETECTED";
+        result.className = "green";
+        alerta.innerHTML = "";
+        empathyResult.innerHTML = "";
+        bsdBox.style.display = "none";
+    }
+
+    debug.innerHTML = "Triggers: " + (detectedEmpathy ? "Empathy: [" + detectedEmpathy + "]" : (foundComplaints.join(", ") || "None"));
+}
+
 function resetTranscript() {
-    fullTranscriptHistory = "";
+    rawTranscriptHistory = "";
     document.getElementById("transcript-box").innerHTML = "";
     document.getElementById("result").innerHTML = "";
     document.getElementById("empathy-result").innerHTML = "";
@@ -482,36 +569,34 @@ async function startMonitoring() {
         const merger = audioContext.createChannelMerger(2);
 
         const micSource = audioContext.createMediaStreamSource(micStream);
-        const systemSource = audioContext.createMediaStreamSource(new MediaStream([systemAudioTrack]));
+        const systemSource = audioContext.createMediaStreamSource(systemStream);
 
-        // Canal 0 = Agent (Micrófono)
-        micSource.connect(merger, 0, 0);
-        // Canal 1 = Borrower (Audio del sistema / Auriculares)
-        systemSource.connect(merger, 0, 1);
+        micSource.connect(merger, 0, 0);       // Canal 0: Agente
+        systemSource.connect(merger, 0, 1);    // Canal 1: Cliente
 
-        const combinedDestination = audioContext.createMediaStreamDestination();
-        merger.connect(combinedDestination);
+        const dest = audioContext.createMediaStreamDestination();
+        merger.connect(dest);
+        mediaStream = dest.stream;
 
-        mediaStream = combinedDestination.stream;
+        var langCode = (selectedLang === "es") ? "es" : "en-US";
+        var wsUrl = "wss://api.deepgram.com/v1/listen?encoding=linear16&sample_rate=" + audioContext.sampleRate + "&channels=2&multichannel=true&language=" + langCode + "&model=nova-2";
 
-        var wsUrl = "wss://api.deepgram.com/v1/listen?multichannel=true&punctuate=true&language=" + selectedLang;
         socket = new WebSocket(wsUrl, ["token", DEEPGRAM_API_KEY]);
 
         socket.onopen = function() {
-            status.innerText = "🔴 Monitoring Active (Multichannel - Agent & Borrower).";
-            status.style.color = "#4CAF50";
+            status.innerText = "🟢 Active Monitoring...";
+            status.style.color = "#00e676";
             btn.innerText = "🔴 Stop Monitoring";
-            btn.style.backgroundColor = "#ff4d4d";
-            btn.style.color = "#fff";
             isListening = true;
 
-            mediaRecorder = new MediaRecorder(mediaStream, { mimeType: 'audio/webm' });
-            mediaRecorder.addEventListener('dataavailable', function(e) {
-                if (e.data.size > 0 && socket && socket.readyState === WebSocket.OPEN) {
-                    socket.send(e.data);
+            mediaRecorder = new MediaRecorder(mediaStream, { mimeType: "audio/webm" });
+            mediaRecorder.addEventListener("dataavailable", async function(event) {
+                if (event.data.size > 0 && socket.readyState === 1) {
+                    var arrayBuffer = await event.data.arrayBuffer();
+                    socket.send(arrayBuffer);
                 }
             });
-            mediaRecorder.start(10);
+            mediaRecorder.start(250);
         };
 
         socket.onmessage = function(msg) {
@@ -522,33 +607,14 @@ async function startMonitoring() {
                     var channelIdx = (data.channel_index && data.channel_index.length > 0) ? data.channel_index[0] : 0;
                     var speaker = (channelIdx === 0) ? "Agent" : "Borrower";
                     
-                    var masked = maskSensitiveData(transcript);
-                    var formattedText = "<strong>[" + speaker + "]:</strong> " + masked + "<br>";
-                    
-                    fullTranscriptHistory += formattedText;
-                    var box = document.getElementById("transcript-box");
-                    box.innerHTML = fullTranscriptHistory;
-                    box.scrollTop = box.scrollHeight;
-
-                    var norm = normalize(masked);
-
-                    if (speaker === "Borrower") {
-                        var bsd = getBSDSuggestion(norm);
-                        var bsdBox = document.getElementById("bsd-suggestion");
-                        bsdBox.innerHTML = bsd;
-                        bsdBox.style.display = "block";
-                    }
-
-                    var emp = checkEmpathy(norm);
-                    if (emp) {
-                        document.getElementById("empathy-result").innerHTML = "<span class='green'>Empathy Detected (" + speaker + "): " + emp + "</span>";
-                    }
+                    rawTranscriptHistory += "[" + speaker + "]: " + transcript + "<br>";
+                    analyzeRealtime(rawTranscriptHistory);
                 }
             }
         };
 
         socket.onerror = function(err) {
-            console.error("WebSocket Error: ", err);
+            console.error("WebSocket Error:", err);
             stopMonitoring();
         };
 
@@ -558,32 +624,30 @@ async function startMonitoring() {
 
     } catch (err) {
         console.error("Error starting monitoring:", err);
-        alert("Could not access audio sources. Make sure to grant permissions.");
-        stopMonitoring();
+        status.innerText = "❌ Error accessing audio source.";
+        status.style.color = "#ff4d4d";
+        isListening = false;
     }
 }
 
 function stopMonitoring() {
-    isListening = false;
+    var btn = document.getElementById("btn-start");
+    var status = document.getElementById("status");
 
     if (mediaRecorder && mediaRecorder.state !== "inactive") {
         mediaRecorder.stop();
     }
-    if (socket && socket.readyState === WebSocket.OPEN) {
+    if (socket && socket.readyState === 1) {
         socket.close();
     }
-    if (audioContext && audioContext.state !== "closed") {
+    if (audioContext) {
         audioContext.close();
     }
 
-    var btn = document.getElementById("btn-start");
-    var status = document.getElementById("status");
-
-    btn.innerText = "🟢 Start Monitoring.";
-    btn.style.backgroundColor = "#ffd700";
-    btn.style.color = "#000";
+    isListening = false;
     status.innerText = "⏸️ Monitoring paused.";
     status.style.color = "#ffd700";
+    btn.innerText = "🟢 Start Monitoring.";
 }
 </script>
 </body>
