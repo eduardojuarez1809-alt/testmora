@@ -246,7 +246,46 @@ var glossary = [
     "dolor en el trasero","vete al infierno","callate","callate al demonio","callate la mierda","a la mierda con esto",
     "esto es mierda","esto es porqueria","esto es ridiculo","esto es una locura","esto es estupido","esto esta mal hecho",
     "esto esta mal","la arruinaste","me arruinaste","mentiste","fallaste","no te importa","increible","indignante",
-    "frustrante","enojo","enfurecedor","violando","puta","puto"
+    "frustrante","enojo","enfurecedor","violando","puta","puto",
+
+    /* Variaciones de "No me dejó" y problemas de bloqueo / acceso / error (Español) */
+    "no me dejo", "no me deja", "no me permitio", "no me permite", "no me dio acceso", "no me deja entrar",
+    "no me dejo entrar", "no me deja ingresar", "no me dejo ingresar", "no me deja avanzar", "no me dejo avanzar",
+    "no me deja pagar", "no me dejo pagar", "no me deja hacer el pago", "no me dejo hacer el pago",
+    "no me deja procesar", "no me dejo procesar", "no me deja continuar", "no me dejo continuar",
+    "no me deja guardar", "no me dejo guardar", "no me deja enviar", "no me dejo enviar",
+    "no me deja cambiar", "no me dejo cambiar", "no me deja actualizar", "no me dejo actualizar",
+    "no me deja seleccionar", "no me dejo seleccionar", "no me deja iniciar sesion", "no me dejo iniciar sesion",
+    "no me deja hacer nada", "no me dejo hacer nada", "no me deja hacer la transaccion", "no me dejo hacer la transaccion",
+    "no me deja completar", "no me dejo completar", "el sistema no me deja", "el sistema no me dejo",
+    "la pagina no me deja", "la pagina no me dejo", "la aplicacion no me deja", "la app no me deja",
+    "la aplicacion no me dejo", "la app no me dejo", "el sitio no me deja", "el sitio no me dejo",
+    "no me lo permitio", "no me da opcion", "no me dio opcion", "no me da acceso", "no me dio acceso",
+    "no me reconoce la contraseña", "no me acepta la clave", "no me acepta la tarjeta", "no me acepta el pago",
+    "me saca del sistema", "me saco del sistema", "me rebota el pago", "me rebotó el pago",
+    "me marca error", "me marco error", "me da error", "me dio error", "me sale un error", "me salio un error",
+    "me aparece un error", "me aparecio un error", "me bloquea", "me bloqueo", "me tiene bloqueado",
+    "me rechaza la transaccion", "me rechazo el pago", "no me da acceso a la cuenta", "no me permite pagar",
+
+    /* Variaciones equivalentes en Inglés */
+    "didn't let me", "does not let me", "doesn't let me", "won't let me", "wouldn't let me",
+    "didn't allow me", "does not allow me", "doesn't allow me", "won't allow me", "wouldn't allow me",
+    "didn't let me log in", "doesn't let me log in", "won't let me log in", "wouldn't let me log in",
+    "didn't let me sign in", "doesn't let me sign in", "won't let me sign in",
+    "didn't let me pay", "doesn't let me pay", "won't let me pay", "wouldn't let me pay",
+    "didn't let me make the payment", "doesn't let me make the payment", "won't let me make payment",
+    "didn't let me submit", "doesn't let me submit", "won't let me submit",
+    "didn't let me proceed", "doesn't let me proceed", "won't let me proceed",
+    "didn't let me continue", "doesn't let me continue", "won't let me continue",
+    "didn't let me complete", "doesn't let me complete", "won't let me complete",
+    "didn't let me update", "doesn't let me update", "won't let me update",
+    "didn't let me save", "doesn't let me save", "won't let me save",
+    "didn't let me select", "doesn't let me select", "won't let me select",
+    "didn't let me access", "doesn't let me access", "won't let me access",
+    "system didn't let me", "system won't let me", "system doesn't let me",
+    "website won't let me", "app won't let me", "page won't let me",
+    "it gives me an error", "it gave me an error", "it keeps giving me an error",
+    "it kicked me out", "it locked me out", "my account is locked", "i'm locked out"
 ];
 
 var empathyPhrases = [
@@ -323,30 +362,30 @@ var empathyKeywords = [
 ];
 
 var bsdRules = [
-    { code: "BSDFRD", label: "Fraud", keywords: ["fraud", "identity theft", "stolen", "scam", "fraude", "robo de identidad", "usurpacion"] },
-    { code: "BSDBNK", label: "Bankruptcy Issue Resolved", keywords: ["bankrupt", "bankruptcy", "chapter 7", "chapter 13", "bancarrota", "quiebra"] },
-    { code: "BSDFOR", label: "Foreclosure Issue Resolved", keywords: ["foreclosure", "sheriff sale", "seizure", "ejecucion hipotecaria", "embargo"] },
-    { code: "BSDCBR", label: "Credit Report Issue Resolved", keywords: ["credit report", "credit bureau", "equifax", "experian", "transunion", "reporte de credito", "buro de credito"] },
-    { code: "BSDACH", label: "ACH Issue Resolved", keywords: ["ach", "direct debit", "auto pay", "automatic payment", "debito automatico", "retiro automatico", "pago automatico"] },
-    { code: "BSDFEE", label: "Fee Issue Resolved", keywords: ["fee", "late fee", "charge", "penalty", "cargo", "tarifa", "comision", "multa", "cobro indebido"] },
-    { code: "BSDTAX", label: "Taxes Issues Resolved", keywords: ["tax", "taxes", "property tax", "1098", "impuesto", "impuestos", "contribuciones"] },
-    { code: "BSDINS", label: "Insurance Issue Resolved", keywords: ["insurance", "hazard insurance", "flood insurance", "policy", "seguro", "poliza", "aseguradora"] },
-    { code: "BSDESC", label: "Escrow Issue Resolved", keywords: ["escrow", "escrow account", "escrow shortage", "caja de ahorro"] },
-    { code: "BSDLOS", label: "Loss Mitigation Issue Resolved", keywords: ["loss mitigation", "loan modification", "forbearance", "workout plan", "modificacion de prestamo", "mitigacion de perdida"] },
-    { code: "BSDMIP", label: "MIP/PMI Issue Resolved", keywords: ["pmi", "mip", "private mortgage insurance", "seguro hipotecario privado"] },
-    { code: "BSDPAY", label: "Payment Issue Resolved", keywords: ["payment", "check", "posting", "afford", "can't pay", "cant pay", "pago", "cheque", "no puedo pagar", "no me alcanza"] },
-    { code: "BSDPOF", label: "Payoff Issue Resolved", keywords: ["payoff", "pay off", "payoff quote", "liquidar", "monto de liquidacion", "saldar cuenta"] },
-    { code: "BSDPFS", label: "PIF Satis. Issue Resolved", keywords: ["paid in full", "satisfaction letter", "pif", "pagado por completo", "satisfaccion de hipoteca"] },
-    { code: "BSDACM", label: "Account Maintenance Issue Resolved", keywords: ["address change", "name change", "mailing address", "account info", "actualizacion de datos", "cambio de direccion"] },
-    { code: "BSDDEF", label: "Default Issue Resolved", keywords: ["default", "delinquent", "behind on payments", "mora", "atraso", "incumplimiento"] },
-    { code: "BSDDIS", label: "Natural Disaster Issue Resolved", keywords: ["disaster", "hurricane", "storm", "flood", "wildfire", "desastre natural", "huracan", "tormenta", "inundacion"] },
-    { code: "BSDEMC", label: "Email/Chat Service Issue Resolved", keywords: ["email", "chat", "message", "correo", "mensaje"] },
-    { code: "BSDPHN", label: "Phone Service Issue Resolved", keywords: ["phone", "call", "hold time", "hung up", "representative", "telefono", "llamada", "tiempo de espera", "representante"] },
-    { code: "BSDWEB", label: "Web Issue Resolved", keywords: ["website", "online portal", "login", "password reset", "pagina web", "sitio web", "clave", "iniciar sesion"] },
-    { code: "BSDYED", label: "Year-End Issue Resolved", keywords: ["year end", "year-end", "annual statement", "1098 statement", "fin de ano", "estado de cuenta anual"] },
-    { code: "BSDDBI", label: "Deceased Borrower Process", keywords: ["deceased", "passed away", "died", "fallecido", "defuncion", "muerto"] },
-    { code: "BSDSII", label: "Successor in Interest", keywords: ["successor", "sii", "heir", "heredero", "sucesor"] },
-    { code: "BSDHEL", label: "HELOC", keywords: ["heloc", "line of credit", "linea de credito"] }
+    { code: "BSDFRD", label: "Fraud", keywords: ["fraud", "identity theft", "stolen", "scam", "fraude", "robo de identidad", "usurpacion", "unauthorized", "suspicious activity", "compromised", "phishing", "fake", "forged", "unauthorized charge", "fraudulent", "fake account", "stolen card", "hacked", "no autorizada", "sin mi consentimiento", "no reconozco", "sospechoso", "estafa", "robo", "enganado", "falsificado"] },
+    { code: "BSDBNK", label: "Bankruptcy Issue Resolved", keywords: ["bankrupt", "bankruptcy", "chapter 7", "chapter 13", "bancarrota", "quiebra", "discharge", "automatic stay", "trustee", "creditors meeting", "341 meeting", "filing bankruptcy", "reorganization", "insolvency", "declararse en quiebra", "juez de quiebras", "alguacil de quiebras", "suspension automatica", "auto de descarga"] },
+    { code: "BSDFOR", label: "Foreclosure Issue Resolved", keywords: ["foreclosure", "sheriff sale", "seizure", "ejecucion hipotecaria", "embargo", "auction date", "foreclosure attorney", "notice of default", "nod", "notice of sale", "repossessed", "eviction", "remate", "subasta pública", "orden de desalojo", "notificacion de mora", "perder mi casa", "quitar la casa", "rematar mi casa"] },
+    { code: "BSDCBR", label: "Credit Report Issue Resolved", keywords: ["credit report", "credit bureau", "equifax", "experian", "transunion", "reporte de credito", "buro de credito", "late payment reported", "credit score dropped", "dispute credit", "wrong reporting", "delete late", "credit hit", "derogatory mark", "afecto mi credito", "mal reporte", "puntuacion de credito", "bram", "disputa de credito", "historial crediticio", "marca negativa", "remover reporte"] },
+    { code: "BSDACH", label: "ACH Issue Resolved", keywords: ["ach", "direct debit", "auto pay", "automatic payment", "debito automatico", "retiro automatico", "pago automatico", "autopay failed", "double debit", "wrong account debited", "nsf ach", "recurring payment", "cancel autopay", "bank draft", "descuento automatico", "cobro automatico", "doble cobro ach", "cancelar autopay", "debitado de mas", "cuenta equivocado ach", "fallo el autopay"] },
+    { code: "BSDFEE", label: "Fee Issue Resolved", keywords: ["fee", "late fee", "charge", "penalty", "cargo", "tarifa", "comision", "multa", "cobro indebido", "waive fee", "nsf fee", "processing fee", "service fee", "unexplained charge", "improper fee", "reimburse fee", "quitar mora", "quitar recargo", "cargo por atraso", "cargo no autorizado", "comision por pago tardio", "reembolso de multa", "cargos injustificados"] },
+    { code: "BSDTAX", label: "Taxes Issues Resolved", keywords: ["tax", "taxes", "property tax", "1098", "impuesto", "impuestos", "contribuciones", "tax sale", "delinquent taxes", "tax assessment", "county tax", "supplemental tax", "tax penalty", "impuestos de la propiedad", "impuesto predial", "pago de taxes", "contribuciones pendientes", "forma 1098", "intereses e impuestos", "tesoreria del condado"] },
+    { code: "BSDINS", label: "Insurance Issue Resolved", keywords: ["insurance", "hazard insurance", "flood insurance", "policy", "seguro", "poliza", "aseguradora", "force placed insurance", "lender placed", "insurance claim", "dec page", "proof of insurance", "cancellation notice", "insurance premium", "seguro de incendio", "seguro de inundacion", "seguro obligatorio", "comprobante de seguro", "reclamo de seguro", "prima de seguro", "seguro vencido"] },
+    { code: "BSDESC", label: "Escrow Issue Resolved", keywords: ["escrow", "escrow account", "escrow shortage", "caja de ahorro", "escrow surplus", "escrow analysis", "cushion", "escrow balance", "impound account", "escrow deficiency", "aumento de escrow", "deficit de escrow", "sobrante de escrow", "analisis de escrow", "cuenta pliza y taxes", "reserva de escrow", "aumento de pago mensual por escrow"] },
+    { code: "BSDLOS", label: "Loss Mitigation Issue Resolved", keywords: ["loss mitigation", "loan modification", "forbearance", "workout plan", "modificacion de prestamo", "mitigacion de perdida", "trial plan", "deferment", "partial claim", "short sale", "deed in lieu", "assistance package", "hardship", "modificacion de hipoteca", "plan de pagos", "diferimiento", "venta corta", "paquete de ayuda", "dificultad financiera", "pausa de pagos", "arreglo de pago"] },
+    { code: "BSDMIP", label: "MIP/PMI Issue Resolved", keywords: ["pmi", "mip", "private mortgage insurance", "seguro hipotecario privado", "pmi removal", "cancel pmi", "pmi disclosure", "ltv requirement", "appraisal for pmi", "fha mip", "cancelar pmi", "quitar seguro hipotecario", "eliminacion de pmi", "porcentaje del prestamo", "avaluo para pmi", "prima de seguro hipotecario"] },
+    { code: "BSDPAY", label: "Payment Issue Resolved", keywords: ["payment", "check", "posting", "afford", "can't pay", "cant pay", "pago", "cheque", "no puedo pagar", "no me alcanza", "payment unapplied", "suspense account", "partial payment", "misapplied payment", "grace period", "payment posted late", "cashier check", "money order", "pago no reflejado", "cuenta de suspenso", "pago incompleto", "pago mal aplicado", "giro postal", "cheque rebotado", "fecha de corte de pago"] },
+    { code: "BSDPOF", label: "Payoff Issue Resolved", keywords: ["payoff", "pay off", "payoff quote", "liquidar", "monto de liquidacion", "saldar cuenta", "payoff demand", "good-through date", "payoff fees", "payoff wiring instructions", "pay off balance", "cotizacion de liquidacion", "monto para cancelar hipoteca", "instrucciones de transferencia para pago total", "cuanto debo para cancelar", "saldo total"] },
+    { code: "BSDPFS", label: "PIF Satis. Issue Resolved", keywords: ["paid in full", "satisfaction letter", "pif", "pagado por completo", "satisfaccion de hipoteca", "lien release", "deed of reconveyance", "mortgage release", "cancelation certificate", "account paid off", "carta de saldo", "liberacion de gravamen", "titulo cancelado", "cancelacion de hipoteca", "prestamo totalmente pagado", "documento de reconcesion"] },
+    { code: "BSDACM", label: "Account Maintenance Issue Resolved", keywords: ["address change", "name change", "mailing address", "account info", "actualizacion de datos", "cambio de direccion", "update phone", "update email", "marriage certificate", "divorce decree", "authorized party", "change of ownership", "actualizar telefono", "actualizar correo", "cambiar nombre de titular", "tercero autorizado", "acta de matrimonio", "decreto de divorcio", "datos de contacto"] },
+    { code: "BSDDEF", label: "Default Issue Resolved", keywords: ["default", "delinquent", "behind on payments", "mora", "atraso", "incumplimiento", "past due", "late payments", "breach letter", "acceleration notice", "cure period", "pago atrasado", "cuotas vencidas", "carta de incumplimiento", "estado de mora", "atrasado con la hipoteca", "notificacion de aceleracion"] },
+    { code: "BSDDIS", label: "Natural Disaster Issue Resolved", keywords: ["disaster", "hurricane", "storm", "flood", "wildfire", "desastre natural", "huracan", "tormenta", "inundacion", "fema", "tornado", "earthquake", "disaster relief", "disaster forbearance", "property damage", "terremoto", "incendio forestal", "alerta de desastre", "declaracion de fema", "alivio por desastre", "danos a la propiedad por clima"] },
+    { code: "BSDEMC", label: "Email/Chat Service Issue Resolved", keywords: ["email", "chat", "message", "correo", "mensaje", "secure message", "webchat", "no response", "email bounced", "chat disconnected", "attachment issue", "portal message", "correo electronico", "chat en linea", "no me contestaron el correo", "error en archivo adjunto", "mensaje de portal"] },
+    { code: "BSDPHN", label: "Phone Service Issue Resolved", keywords: ["phone", "call", "hold time", "hung up", "representative", "telefono", "llamada", "tiempo de espera", "representante", "bad connection", "dropped call", "transferred multiple times", "rude agent", "no callback", "call center", "espera muy larga", "me cortaron la llamada", "me colgaron", "transferencia repetida", "agente grosero", "no me devolvieron la llamada", "mala señal"] },
+    { code: "BSDWEB", label: "Web Issue Resolved", keywords: ["website", "online portal", "login", "password reset", "pagina web", "sitio web", "clave", "iniciar sesion", "system error", "site down", "app crashed", "2fa code", "locked out", "technical glitch", "error de pagina", "sistema caido", "falla la app", "olvide mi contraseña", "cuenta bloqueada", "no me deja entrar", "problema con el portal", "codigo de verificacion no llega"] },
+    { code: "BSDYED", label: "Year-End Issue Resolved", keywords: ["year end", "year-end", "annual statement", "1098 statement", "fin de ano", "estado de cuenta anual", "tax form 1098", "year end escrow summary", "annual tax info", "escrow statement annual", "resumen anual", "estado de cuenta de fin de año", "formulario de impuestos 1098", "informacion fiscal anual", "resumen de intereses pagados"] },
+    { code: "BSDDBI", label: "Deceased Borrower Process", keywords: ["deceased", "passed away", "died", "fallecido", "defuncion", "muerto", "death certificate", "borrower passed", "surviving spouse", "estate administrator", "probate", "acta de defuncion", "titular fallecio", "conyuge sobreviviente", "administrador de bienes", "juicio sucesorio", "fallecimiento del cliente"] },
+    { code: "BSDSII", label: "Successor in Interest", keywords: ["successor", "sii", "heir", "heredero", "sucesor", "successor in interest", "inherited property", "transfer of ownership", "sii package", "legal heir", "propiedad heredada", "transferencia de propiedad", "paquete de sucesor", "heredero legal", "derecho de sucesion", "asumir la propiedad"] },
+    { code: "BSDHEL", label: "HELOC", keywords: ["heloc", "line of credit", "linea de credito", "home equity", "draw period", "repayment period", "variable rate heloc", "credit line limit", "heloc checkbook", "equity line", "periodo de retiro", "periodo de pago heloc", "tasa variable de credito", "limite de linea de credito", "credito sobre la plusvalia"] }
 ];
 
 function normalize(text) {
@@ -365,12 +404,22 @@ function normalize(text) {
 
 function maskSensitiveData(text) {
     return text
+        // Seguro Social (SSN)
         .replace(/\b\d{3}[-\s]?\d{2}[-\s]?\d{4}\b/g, '***-**-****')
+        // Tarjetas de Crédito / Cuentas de 13 a 19 dígitos
+        .replace(/\b\d{4}[-\s]?\d{4}[-\s]?\d{4}[-\s]?\d{1,7}\b/g, '****-****-****-****')
+        // Montos monetarios ($1,000.00, USD 500, $500, etc.)
         .replace(/(\$|usd\s?)\d+(?:,\d{3})*(?:\.\d{1,2})?/gi, '***')
-        .replace(/\b\d+\b/g, '****')
-        .replace(/\b(zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety)\b/gi, '*')
-        .replace(/\b(cero|uno|una|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|once|doce|trece|catorce|quince|diecisiete|dieciocho|diecinueve|veinte|treinta|cuarenta|cincuenta|sesenta|setenta|ochenta|noventa)\b/gi, '*')
-        .replace(/\b(hundred|thousand|million|billion|dollar|dollars|cent|cents|dolar|dolares|ciento|cientos|mil|millon|millones)\b/gi, '***');
+        // Números telefónicos (Formatos estándar de EE.UU. e internacionales)
+        .replace(/(?:\+?1[-\s]?)?\(?\d{3}\)?[-\s]?\d{3}[-\s]?\d{4}/g, '***-***-****')
+        // Secuencias numéricas continuas o de cuentas (4 dígitos en adelante)
+        .replace(/\b\d{4,}\b/g, '****')
+        // Números individuales aislados (1, 2, 3 dígitos)
+        .replace(/\b\d{1,3}\b/g, '*')
+        // Números en palabras (Inglés)
+        .replace(/\b(zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred|thousand|million|billion|trillion|dollar|dollars|cent|cents)\b/gi, '*')
+        // Números en palabras (Español)
+        .replace(/\b(cero|uno|una|unos|unas|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|once|doce|trece|catorce|quince|dieciseis|diecisiete|dieciocho|diecinueve|veinte|veintiuno|veintidos|veintitres|veinticuatro|veinticinco|veintiseis|veintisiete|veintiocho|veintinueve|treinta|cuarenta|cincuenta|sesenta|setenta|ochenta|noventa|ciento|cientos|cien|quinientos|seiscientos|setecientos|ochocientos|novecientos|mil|millon|millones|dolar|dolares|centavo|centavos)\b/gi, '*');
 }
 
 function checkEmpathy(textNormalized) {
