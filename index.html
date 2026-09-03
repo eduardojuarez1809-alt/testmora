@@ -158,7 +158,7 @@ mark.highlight-trigger {
 </head>
 <body>
 
-<h2>M.O.RA PROJECT</h2>
+<h2>M.O.R.A PROJECT</h2>
 
 <div class="controls-container">
     <button id="btn-start" onclick="toggleMonitoring()">🟢 Start Monitoring.</button>
@@ -191,6 +191,21 @@ var mediaStream = null;
 var audioContext = null;
 var isListening = false;
 var rawTranscriptHistory = "";
+
+// Frases de apertura para activar auto-reset
+var openingPhrases = [
+    "thank you for calling",
+    "thanks for calling",
+    "my name is",
+    "how can i help you",
+    "how may i help you",
+    "how can i assist you",
+    "gracias por llamar",
+    "mi nombre es",
+    "en que le puedo ayudar",
+    "como le puedo ayudar",
+    "como le puedo asistir"
+];
 
 var glossary = [
     "don't understand", "dont understand", "do not understand", "doesn't make sense", "doesnt make sense",
@@ -373,6 +388,15 @@ function maskSensitiveData(text) {
         .replace(/\b\d{1,3}\b/g, '*')
         .replace(/\b(zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred|thousand|million|billion|trillion|dollar|dollars|cent|cents)\b/gi, '*')
         .replace(/\b(cero|uno|una|unos|unas|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|once|doce|trece|catorce|quince|diecisiete|dieciocho|diecinueve|veinte|veintiuno|veintidos|veintidós|veintitres|veintitrés|veinticinco|veintiseis|veintisiete|veintiocho|veintinueve|treinta|cuarenta|cincuenta|sesenta|setenta|ochenta|noventa|ciento|cientos|cien|quinientos|seiscientos|setecientos|ochocientos|novecientos|mil|millon|millones|dolar|dolares|centavo|centavos)\b/gi, '*');
+}
+
+function checkOpeningPhrase(textNormalized) {
+    for (var i = 0; i < openingPhrases.length; i++) {
+        if (textNormalized.indexOf(openingPhrases[i]) !== -1) {
+            return true;
+        }
+    }
+    return false;
 }
 
 function checkEmpathy(textNormalized) {
@@ -596,7 +620,7 @@ async function startMonitoring() {
                     socket.send(arrayBuffer);
                 }
             });
-            mediaRecorder.start(250);
+            mediaRecorder.start(10);
         };
 
         socket.onmessage = function(msg) {
@@ -607,6 +631,13 @@ async function startMonitoring() {
                     var channelIdx = (data.channel_index && data.channel_index.length > 0) ? data.channel_index[0] : 0;
                     var speaker = (channelIdx === 0) ? "Agent" : "Borrower";
                     
+                    var normFragment = normalize(transcript);
+
+                    // Si habla el Agente y pronuncia una frase de apertura, se auto-reinicia la transcripción
+                    if (speaker === "Agent" && checkOpeningPhrase(normFragment)) {
+                        resetTranscript();
+                    }
+
                     rawTranscriptHistory += "[" + speaker + "]: " + transcript + "<br>";
                     analyzeRealtime(rawTranscriptHistory);
                 }
