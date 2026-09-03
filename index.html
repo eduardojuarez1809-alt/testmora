@@ -161,8 +161,8 @@ mark.highlight-trigger {
 <h2>M.O.R.A PROJECT</h2>
 
 <div class="controls-container">
-    <button id="btn-start">🟢 Start Monitoring.</button>
-    <button id="btn-reset">🔄 Restart MORA</button>
+    <button id="btn-start" onclick="toggleMonitoring()">🟢 Start Monitoring.</button>
+    <button id="btn-reset" onclick="resetTranscript()">🔄 Restart MORA</button>
     <select id="lang-select">
         <option value="en">🇺🇸 English</option>
         <option value="es">🇲🇽 Español</option>
@@ -289,7 +289,6 @@ var glossary = [
 ];
 
 var empathyPhrases = [
-    // Frases de empatía originales
     "i apologize for the inconvenience", "i am sorry for the frustration", "sorry for the inconvenience",
     "apologize for the inconvenience", "sincerely apologize", "sorry for any confusion",
     "apologize for the misunderstanding", "regret the inconvenience", "sorry for the delay",
@@ -299,60 +298,24 @@ var empathyPhrases = [
     "understand why you would feel frustrated", "see why this would be upsetting",
     "understand the importance", "appreciate the opportunity", "entiendo completamente",
     "comprendo por que", "reconozco la importancia", "sus preocupaciones son validas",
-
-    // Frases en Inglés
-    "I didn't get the billing statement",
-    "I never received my statement",
-    "I was not aware a payment was due",
-    "Nobody informed me about the payment",
-    "I don't want this to affect my credit",
-    "I am concerned about my credit score",
-    "I don't think this should impact my credit",
-    "This is not fair",
-    "I don't think that's fair",
-    "It's very frustrating",
-    "This is very upsetting",
-    "It's concerning",
-    "It's very unnerving",
-    "This situation has me worried",
-    "I was just confused because of that",
-    "Nobody can confirm it",
-    "No one can give me a clear answer",
-    "I keep getting different information",
-    "I don't understand what happened",
-    "Had I received the statement, I would have paid on time",
-    "I shouldn't be penalized for this",
-    "I feel like this is not my fault",
-    "I'm being held responsible for something I wasn't aware of",
-    "I need confirmation that my credit won't be affected",
-    "This has caused me unnecessary stress",
-
-    // Frases en Español
-    "No recibí el estado de cuenta",
-    "Nunca recibí mi estado de cuenta",
-    "No sabía que tenía un pago pendiente",
-    "Nadie me informó sobre el pago",
-    "No quiero que esto afecte mi crédito",
-    "Estoy preocupado por mi historial crediticio",
-    "No considero justo que esto impacte mi crédito",
-    "Esto no es justo",
-    "No me parece justo",
-    "Es muy frustrante",
-    "Esta situación es muy molesta",
-    "Es preocupante",
-    "Me genera mucha incertidumbre",
-    "Esta situación me tiene preocupado",
-    "Estaba confundido por esa razón",
-    "Nadie puede confirmármelo",
-    "Nadie me puede dar una respuesta clara",
-    "Sigo recibiendo información diferente",
-    "No entiendo qué fue lo que pasó",
-    "Si hubiera recibido el estado de cuenta, habría pagado a tiempo",
-    "No deberían penalizarme por esto",
-    "Siento que esto no fue mi culpa",
-    "Me están responsabilizando por algo que desconocía",
-    "Necesito una confirmación de que mi crédito no será afectado",
-    "Esto me ha causado estrés innecesario"
+    "I didn't get the billing statement", "I never received my statement", "I was not aware a payment was due",
+    "Nobody informed me about the payment", "I don't want this to affect my credit", "I am concerned about my credit score",
+    "I don't think this should impact my credit", "This is not fair", "I don't think that's fair",
+    "It's very frustrating", "This is very upsetting", "It's concerning", "It's very unnerving",
+    "This situation has me worried", "I was just confused because of that", "Nobody can confirm it",
+    "No one can give me a clear answer", "I keep getting different information", "I don't understand what happened",
+    "Had I received the statement, I would have paid on time", "I shouldn't be penalized for this",
+    "I feel like this is not my fault", "I'm being held responsible for something I wasn't aware of",
+    "I need confirmation that my credit won't be affected", "This has caused me unnecessary stress",
+    "No recibí el estado de cuenta", "Nunca recibí mi estado de cuenta", "No sabía que tenía un pago pendiente",
+    "Nadie me informó sobre el pago", "No quiero que esto afecte mi crédito", "Estoy preocupado por mi historial crediticio",
+    "No considero justo que esto impacte mi crédito", "Esto no es justo", "No me parece justo",
+    "Es muy frustrante", "Esta situación es muy molesta", "Es preocupante", "Me genera mucha incertidumbre",
+    "Esta situación me tiene preocupado", "Estaba confundido por esa razón", "Nadie puede confirmármelo",
+    "Nadie me puede dar una respuesta clara", "Sigo recibiendo información diferente", "No entiendo qué fue lo que pasó",
+    "Si hubiera recibido el estado de cuenta, habría pagado a tiempo", "No deberían penalizarme por esto",
+    "Siento que esto no fue mi culpa", "Me están responsabilizando por algo que desconocía",
+    "Necesito una confirmación de que mi crédito no será afectado", "Esto me ha causado estrés innecesario"
 ];
 
 var empathyKeywords = [
@@ -404,22 +367,14 @@ function normalize(text) {
 
 function maskSensitiveData(text) {
     return text
-        // Seguro Social (SSN)
         .replace(/\b\d{3}[-\s]?\d{2}[-\s]?\d{4}\b/g, '***-**-****')
-        // Tarjetas de Crédito / Cuentas de 13 a 19 dígitos
         .replace(/\b\d{4}[-\s]?\d{4}[-\s]?\d{4}[-\s]?\d{1,7}\b/g, '****-****-****-****')
-        // Montos monetarios ($1,000.00, USD 500, $500, etc.)
         .replace(/(\$|usd\s?)\d+(?:,\d{3})*(?:\.\d{1,2})?/gi, '***')
-        // Números telefónicos (Formatos estándar de EE.UU. e internacionales)
         .replace(/(?:\+?1[-\s]?)?\(?\d{3}\)?[-\s]?\d{3}[-\s]?\d{4}/g, '***-***-****')
-        // Secuencias numéricas continuas o de cuentas (4 dígitos en adelante)
         .replace(/\b\d{4,}\b/g, '****')
-        // Números individuales aislados (1, 2, 3 dígitos)
         .replace(/\b\d{1,3}\b/g, '*')
-        // Números en palabras (Inglés)
         .replace(/\b(zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred|thousand|million|billion|trillion|dollar|dollars|cent|cents)\b/gi, '*')
-        // Números en palabras (Español)
-        .replace(/\b(cero|uno|una|unos|unas|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|once|doce|trece|catorce|quince|dieciseis|diecisiete|dieciocho|diecinueve|veinte|veintiuno|veintidos|veintitres|veinticuatro|veinticinco|veintiseis|veintisiete|veintiocho|veintinueve|treinta|cuarenta|cincuenta|sesenta|setenta|ochenta|noventa|ciento|cientos|cien|quinientos|seiscientos|setecientos|ochocientos|novecientos|mil|millon|millones|dolar|dolares|centavo|centavos)\b/gi, '*');
+        .replace(/\b(cero|uno|una|unos|unas|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|once|doce|trece|catorce|quince|dieciseis|diecisiete|dieciocho|diecinueve|veinte|veintiuno|veintidos|veintitres|veinticinco|veintiseis|veintisiete|veintiocho|veintinueve|treinta|cuarenta|cincuenta|sesenta|setenta|ochenta|noventa|ciento|cientos|cien|quinientos|seiscientos|setecientos|ochocientos|novecientos|mil|millon|millones|dolar|dolares|centavo|centavos)\b/gi, '*');
 }
 
 function checkEmpathy(textNormalized) {
@@ -509,201 +464,127 @@ async function startMonitoring() {
         if (!systemAudioTrack) {
             alert("⚠️ Important: You must check 'Share system audio' in the popup window.");
             systemStream.getTracks().forEach(t => t.stop());
-            status.innerText = "⏸️ Monitoring cancelled or permissions denied.";
+            status.innerText = "⏸️ Monitoring paused.";
             return;
         }
 
+        status.innerText = "⏳ 2/2: Requesting microphone access (Agent)...";
+
+        const micStream = await navigator.mediaDevices.getUserMedia({
+            audio: {
+                echoCancellation: true,
+                noiseSuppression: true,
+                autoGainControl: true
+            }
+        });
+
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        if (audioContext.state === 'suspended') {
-            await audioContext.resume();
-        }
+        const merger = audioContext.createChannelMerger(2);
 
-        const destination = audioContext.createMediaStreamDestination();
+        const micSource = audioContext.createMediaStreamSource(micStream);
         const systemSource = audioContext.createMediaStreamSource(new MediaStream([systemAudioTrack]));
-        systemSource.connect(destination);
 
-        status.innerText = "⏳ 2/2: Authorize microphone access...";
-        
-        let micStream = null;
-        try {
-            micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            const micSource = audioContext.createMediaStreamSource(micStream);
-            micSource.connect(destination);
-        } catch (micError) {
-            console.warn("Microphone skipped or denied:", micError);
-        }
+        // Canal 0 = Agent (Micrófono)
+        micSource.connect(merger, 0, 0);
+        // Canal 1 = Borrower (Audio del sistema / Auriculares)
+        systemSource.connect(merger, 0, 1);
 
-        const combinedTrack = destination.stream.getAudioTracks()[0];
-        mediaStream = new MediaStream([combinedTrack, systemStream.getVideoTracks()[0]]);
+        const combinedDestination = audioContext.createMediaStreamDestination();
+        merger.connect(combinedDestination);
 
-        const wsUrl = `wss://api.deepgram.com/v1/listen?model=nova-2&language=${selectedLang}&punctuate=true`;
-        socket = new WebSocket(wsUrl, ['token', DEEPGRAM_API_KEY]);
+        mediaStream = combinedDestination.stream;
 
-        socket.onopen = () => {
-            isListening = true;
-            btn.innerHTML = "🛑 Stop Monitoring.";
-            status.innerText = `🟢 Listening to System ${micStream ? '+ Microphone' : ''} (${selectedLang === 'es' ? 'Spanish' : 'English'})...`;
+        var wsUrl = "wss://api.deepgram.com/v1/listen?multichannel=true&punctuate=true&language=" + selectedLang;
+        socket = new WebSocket(wsUrl, ["token", DEEPGRAM_API_KEY]);
+
+        socket.onopen = function() {
+            status.innerText = "🔴 Monitoring Active (Multichannel - Agent & Borrower).";
             status.style.color = "#4CAF50";
+            btn.innerText = "🔴 Stop Monitoring";
+            btn.style.backgroundColor = "#ff4d4d";
+            btn.style.color = "#fff";
+            isListening = true;
 
-            mediaRecorder = new MediaRecorder(mediaStream);
-            mediaRecorder.addEventListener('dataavailable', event => {
-                if (event.data.size > 0 && socket.readyState === 1) {
-                    socket.send(event.data);
+            mediaRecorder = new MediaRecorder(mediaStream, { mimeType: 'audio/webm' });
+            mediaRecorder.addEventListener('dataavailable', function(e) {
+                if (e.data.size > 0 && socket && socket.readyState === WebSocket.OPEN) {
+                    socket.send(e.data);
                 }
             });
-            mediaRecorder.start(10);
+            mediaRecorder.start(250);
         };
 
-        socket.onmessage = (message) => {
-            const received = JSON.parse(message.data);
-            const transcript = received.channel?.alternatives[0]?.transcript;
+        socket.onmessage = function(msg) {
+            var data = JSON.parse(msg.data);
+            if (data.channel && data.channel.alternatives && data.channel.alternatives[0]) {
+                var transcript = data.channel.alternatives[0].transcript;
+                if (transcript && transcript.trim().length > 0) {
+                    var channelIdx = (data.channel_index && data.channel_index.length > 0) ? data.channel_index[0] : 0;
+                    var speaker = (channelIdx === 0) ? "Agent" : "Borrower";
+                    
+                    var masked = maskSensitiveData(transcript);
+                    var formattedText = "<strong>[" + speaker + "]:</strong> " + masked + "<br>";
+                    
+                    fullTranscriptHistory += formattedText;
+                    var box = document.getElementById("transcript-box");
+                    box.innerHTML = fullTranscriptHistory;
+                    box.scrollTop = box.scrollHeight;
 
-            if (transcript && transcript.trim().length > 0) {
-                fullTranscriptHistory += " " + transcript;
-                analyzeRealtime(fullTranscriptHistory);
+                    var norm = normalize(masked);
+
+                    if (speaker === "Borrower") {
+                        var bsd = getBSDSuggestion(norm);
+                        var bsdBox = document.getElementById("bsd-suggestion");
+                        bsdBox.innerHTML = bsd;
+                        bsdBox.style.display = "block";
+                    }
+
+                    var emp = checkEmpathy(norm);
+                    if (emp) {
+                        document.getElementById("empathy-result").innerHTML = "<span class='green'>Empathy Detected (" + speaker + "): " + emp + "</span>";
+                    }
+                }
             }
         };
 
-        socket.onerror = (error) => {
-            console.error("WebSocket error:", error);
-            status.innerText = "❌ Connection error with Deepgram.";
-            status.style.color = "#ff4d4d";
-        };
-
-        socket.onclose = () => {
-            if (isListening) stopMonitoring();
-        };
-
-        systemStream.getVideoTracks()[0].onended = () => {
+        socket.onerror = function(err) {
+            console.error("WebSocket Error: ", err);
             stopMonitoring();
         };
 
+        socket.onclose = function() {
+            if (isListening) stopMonitoring();
+        };
+
     } catch (err) {
-        console.error("General error in startMonitoring:", err);
-        status.innerText = "⏸️ Monitoring cancelled or permissions denied.";
-        status.style.color = "#ffd700";
+        console.error("Error starting monitoring:", err);
+        alert("Could not access audio sources. Make sure to grant permissions.");
+        stopMonitoring();
     }
 }
 
 function stopMonitoring() {
     isListening = false;
+
+    if (mediaRecorder && mediaRecorder.state !== "inactive") {
+        mediaRecorder.stop();
+    }
+    if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.close();
+    }
+    if (audioContext && audioContext.state !== "closed") {
+        audioContext.close();
+    }
+
     var btn = document.getElementById("btn-start");
     var status = document.getElementById("status");
 
-    if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
-    if (socket && socket.readyState === 1) socket.close();
-    if (audioContext) {
-        audioContext.close();
-        audioContext = null;
-    }
-    if (mediaStream) {
-        mediaStream.getTracks().forEach(track => track.stop());
-        mediaStream = null;
-    }
-
-    btn.innerHTML = "🏁 Start Monitoring.";
+    btn.innerText = "🟢 Start Monitoring.";
+    btn.style.backgroundColor = "#ffd700";
+    btn.style.color = "#000";
     status.innerText = "⏸️ Monitoring paused.";
     status.style.color = "#ffd700";
 }
-
-async function handleLanguageChange() {
-    if (isListening) {
-        stopMonitoring();
-        await startMonitoring();
-    }
-}
-
-function analyzeRealtime(text) {
-    var maskedText = maskSensitiveData(text);
-    var textNormalized = normalize(maskedText);
-    var score = 0;
-    var foundComplaints = [];
-
-    for (var i = 0; i < glossary.length; i++) {
-        var termNorm = normalize(glossary[i]);
-        if (termNorm.indexOf(" ") !== -1) {
-            if (textNormalized.indexOf(termNorm) !== -1) {
-                score++;
-                foundComplaints.push(glossary[i]);
-            }
-        } else {
-            var words = textNormalized.split(" ");
-            for (var j = 0; j < words.length; j++) {
-                if (words[j] === termNorm) {
-                    if (words[j - 1] === "not" || words[j - 1] === "no") continue;
-                    score++;
-                    foundComplaints.push(glossary[i]);
-                    break;
-                }
-            }
-        }
-    }
-
-    var detectedEmpathy = checkEmpathy(textNormalized);
-    
-    var highlightedText = maskedText;
-    var allTriggersToHighlight = foundComplaints.concat(
-        detectedEmpathy ? detectedEmpathy.split(", ") : []
-    );
-
-    allTriggersToHighlight.sort((a, b) => b.length - a.length);
-
-    allTriggersToHighlight.forEach(function(trigger) {
-        if (trigger.trim() !== "") {
-            var regex = new RegExp("(" + trigger.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ")", "gi");
-            highlightedText = highlightedText.replace(regex, '<mark class="highlight-trigger">$1</mark>');
-        }
-    });
-
-    var box = document.getElementById("transcript-box");
-    box.innerHTML = highlightedText;
-    box.scrollTop = box.scrollHeight;
-
-    var result = document.getElementById("result");
-    var empathyResult = document.getElementById("empathy-result");
-    var bsdBox = document.getElementById("bsd-suggestion");
-    var debug = document.getElementById("debug");
-    var alerta = document.getElementById("alerta");
-
-    if (score >= 1) {
-        result.innerHTML = "❌ POTENTIAL COMPLAINT DETECTED (Score: " + score + ")";
-        result.className = "red";
-        alerta.innerHTML = "Please document your complaint in detail. For BSD Code questions, refer to Ref #4088";
-        alerta.className = "red";
-        
-        var suggestedCode = getBSDSuggestion(textNormalized);
-        bsdBox.innerHTML = "📌 Suggested BSD code: <br>" + suggestedCode;
-        bsdBox.style.display = "block";
-    } else if (detectedEmpathy !== "") {
-        result.innerHTML = "⚠️ Evaluating Agent Response";
-        result.className = "yellow";
-        empathyResult.innerHTML = "Based on your response, this could potentially be considered a complaint.";
-        empathyResult.className = "yellow";
-        
-        var suggestedCode = getBSDSuggestion(textNormalized);
-        bsdBox.innerHTML = "📌 Suggested BSD code: <br>" + suggestedCode;
-        bsdBox.style.display = "block";
-        alerta.innerHTML = "";
-    } else {
-        result.innerHTML = "✅ NO COMPLAINT DETECTED";
-        result.className = "green";
-        alerta.innerHTML = "";
-        empathyResult.innerHTML = "";
-        bsdBox.style.display = "none";
-    }
-
-    debug.innerHTML = "Triggers: " + (detectedEmpathy ? "Empathy: [" + detectedEmpathy + "]" : (foundComplaints.join(", ") || "None"));
-}
-
-document.addEventListener("DOMContentLoaded", function() {
-    var btnStart = document.getElementById("btn-start");
-    var btnReset = document.getElementById("btn-reset");
-    var langSelect = document.getElementById("lang-select");
-
-    if (btnStart) btnStart.addEventListener("click", toggleMonitoring);
-    if (btnReset) btnReset.addEventListener("click", resetTranscript);
-    if (langSelect) langSelect.addEventListener("change", handleLanguageChange);
-});
 </script>
 </body>
 </html>
