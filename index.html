@@ -178,22 +178,17 @@ mark.highlight-trigger {
 <div id="moder">MODER</div>
 
 <script>
+const DEEPGRAM_API_KEY = "6ac125a3e51eb51126c7636b1f1477b4480b068b";
+
 var socket = null;
 var audioContext = null;
 var processorNode = null;
 var isListening = false;
 var rawTranscriptHistory = "";
 
-// Frases de apertura para activar auto-reset
 var openingPhrases = [
-    "my name is",
-    "how can i help you",
-    "how may i help you",
-    "how can i assist you",
-    "mi nombre es",
-    "en que le puedo ayudar",
-    "como le puedo ayudar",
-    "como le puedo asistir"
+    "my name is", "how can i help you", "how may i help you", "how can i assist you",
+    "mi nombre es", "en que le puedo ayudar", "como le puedo ayudar", "como le puedo asistir"
 ];
 
 var glossary = [
@@ -406,7 +401,7 @@ function getBSDSuggestion(textNormalized) {
     }
 
     if (bestMatch && maxScore > 0) {
-        return "<strong>" + bestMatch.rule.code + "</strong> — Borrower States Dissatisfaction - " + bestMatch.rule.label + 
+        return "<strong>" + bestMatch.rule.code + "</strong> — Borrower States Dissatisfaction - " + bestMatch.rule.label +
                "<br><small style='color:#aaa;'>Match detected by: [" + bestMatch.matchedKeys.join(", ") + "]</small>";
     }
 
@@ -534,6 +529,7 @@ function convertFloat32ToInt16(buffer) {
 async function startMonitoring() {
     var btn = document.getElementById("btn-start");
     var status = document.getElementById("status");
+    var selectedLang = document.getElementById("lang-select").value;
 
     try {
         status.innerText = "⏳ 1/2: Select screen/tab and enable 'Share system audio'...";
@@ -559,6 +555,7 @@ async function startMonitoring() {
         });
 
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const sampleRate = audioContext.sampleRate;
 
         const merger = audioContext.createChannelMerger(2);
         const micSource = audioContext.createMediaStreamSource(micStream);
@@ -567,9 +564,10 @@ async function startMonitoring() {
         micSource.connect(merger, 0, 0);       // Canal 0: Agente
         systemSource.connect(merger, 0, 1);    // Canal 1: Cliente
 
-        // CONEXIÓN AL PROXY LOCAL
-        var wsUrl = "ws://localhost:8080";
-        socket = new WebSocket(wsUrl);
+        var langCode = (selectedLang === "es") ? "es" : "en-US";
+        var wsUrl = "wss://api.deepgram.com/v1/listen?encoding=linear16&sample_rate=" + sampleRate + "&channels=2&multichannel=true&language=" + langCode + "&model=nova-2";
+
+        socket = new WebSocket(wsUrl, ["token", DEEPGRAM_API_KEY]);
 
         socket.onopen = function() {
             status.innerText = "🟢 Active Monitoring...";
