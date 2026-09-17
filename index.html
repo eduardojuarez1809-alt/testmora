@@ -178,7 +178,7 @@ mark.highlight-trigger {
 <div id="moder">MODER</div>
 
 <script>
-const DEEPGRAM_API_KEY = "6ac125a3e51eb51126c7636b1f1477b4480b068b";
+const DEEPGRAM_API_KEY = "6ac125a3e51eb51126c7636b1f1477b4480b068b"; 
 
 var socket = null;
 var audioContext = null;
@@ -186,9 +186,16 @@ var processorNode = null;
 var isListening = false;
 var rawTranscriptHistory = "";
 
+// Frases de apertura para activar auto-reset
 var openingPhrases = [
-    "my name is", "how can i help you", "how may i help you", "how can i assist you",
-    "mi nombre es", "en que le puedo ayudar", "como le puedo ayudar", "como le puedo asistir"
+    "my name is",
+    "how can i help you",
+    "how may i help you",
+    "how can i assist you",
+    "mi nombre es",
+    "en que le puedo ayudar",
+    "como le puedo ayudar",
+    "como le puedo asistir"
 ];
 
 var glossary = [
@@ -401,7 +408,7 @@ function getBSDSuggestion(textNormalized) {
     }
 
     if (bestMatch && maxScore > 0) {
-        return "<strong>" + bestMatch.rule.code + "</strong> — Borrower States Dissatisfaction - " + bestMatch.rule.label +
+        return "<strong>" + bestMatch.rule.code + "</strong> — Borrower States Dissatisfaction - " + bestMatch.rule.label + 
                "<br><small style='color:#aaa;'>Match detected by: [" + bestMatch.matchedKeys.join(", ") + "]</small>";
     }
 
@@ -516,6 +523,7 @@ function toggleMonitoring() {
     }
 }
 
+// Convertidor de Audio a PCM Linear16 de 16-bit
 function convertFloat32ToInt16(buffer) {
     let l = buffer.length;
     let buf = new Int16Array(l);
@@ -575,6 +583,7 @@ async function startMonitoring() {
             btn.innerText = "🔴 Stop Monitoring";
             isListening = true;
 
+            // Procesador en tiempo real para convertir muestras a PCM
             processorNode = audioContext.createScriptProcessor(4096, 2, 2);
             merger.connect(processorNode);
             processorNode.connect(audioContext.destination);
@@ -585,6 +594,7 @@ async function startMonitoring() {
                 const left = e.inputBuffer.getChannelData(0);
                 const right = e.inputBuffer.getChannelData(1);
 
+                // Intercalar canales estéreo (Canal 0 Agente, Canal 1 Cliente)
                 const interleaved = new Float32Array(left.length + right.length);
                 for (let i = 0; i < left.length; i++) {
                     interleaved[i * 2] = left[i];
@@ -606,6 +616,7 @@ async function startMonitoring() {
                     
                     var normFragment = normalize(transcript);
 
+                    // Auto-reset si el Agente dice una frase de opening
                     if (speaker === "Agent" && checkOpeningPhrase(normFragment)) {
                         resetTranscript();
                     }
